@@ -9,7 +9,7 @@
 - Data is saved to MongoDB
 
 ### How to run
-- clone the project
-- install dependencies for both server and client
-- create .env file in project root and specify `DATABASE_URL` variable
-- run the server and client separately or build the client and run only the server
+- Clone the project
+- Install dependencies for both server and client
+- Create `.env` file in project root and specify `DATABASE_URL` variable
+- Run the server and client separately or build the client and run only the server
