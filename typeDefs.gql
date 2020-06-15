@@ -19,10 +19,6 @@ type User {
   avatar: String
 }
 
-type Count {
-  count: Int!
-}
-
 input CreateUserInput {
   email: Email!
   name: String!
