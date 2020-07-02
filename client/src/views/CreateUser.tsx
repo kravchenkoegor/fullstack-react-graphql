@@ -1,4 +1,5 @@
 import React, { useState, useContext } from 'react';
+import { ApolloError } from 'apollo-boost';
 import { useHistory } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/react-hooks';
@@ -11,6 +12,10 @@ import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
 import { AppContext } from '../context/AppContext';
 import { CREATE_USER, GET_USERS, COUNT } from '../queries';
 import { IUser, ICreateUserInputs, EMAIL_REGEX } from '../types';
+
+export const formatMutationError = (error: ApolloError | undefined): string => {
+  return error ? error.message.replace('GraphQL error', 'Error') : '';
+};
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -28,6 +33,9 @@ const useStyles = makeStyles((theme: Theme) =>
       '& + &': {
         marginLeft: theme.spacing(3)
       }
+    },
+    errorMessage: {
+      color: theme.palette.error.main
     }
   })
 );
@@ -66,6 +74,9 @@ const CreateUser: React.FC = () => {
   );
 
   const history = useHistory();
+  const redirectToHome = (): void => {
+    history.push('/');
+  };
   const { register, handleSubmit, errors } = useForm<ICreateUserInputs>();
   const [locked, setLocked] = useState(false);
 
@@ -74,6 +85,7 @@ const CreateUser: React.FC = () => {
       try {
         setLocked(true);
         await createUser({ variables: { input } });
+        redirectToHome();
       } catch (e) {
         setLocked(false);
       }
@@ -81,10 +93,6 @@ const CreateUser: React.FC = () => {
   };
 
   const classes = useStyles();
-
-  if (error) {
-    alert('Name and email should be unique!');
-  }
 
   return (
     <React.Fragment>
@@ -94,6 +102,11 @@ const CreateUser: React.FC = () => {
             Create User
           </Typography>
         </Box>
+        {error && (
+          <Typography className={classes.errorMessage}>
+            {formatMutationError(error)}
+          </Typography>
+        )}
         <TextField
           autoFocus
           margin="normal"
@@ -137,7 +150,7 @@ const CreateUser: React.FC = () => {
           <Button
             className={classes.button}
             color="primary"
-            onClick={() => history.push('/')}
+            onClick={redirectToHome}
           >
             Cancel
           </Button>

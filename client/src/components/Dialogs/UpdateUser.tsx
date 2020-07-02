@@ -5,6 +5,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import TextField from '@material-ui/core/TextField';
+import { Typography } from '@material-ui/core';
 import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
 import { IUpdateUserInputs, IUser, EMAIL_REGEX } from '../../types';
 
@@ -17,6 +18,9 @@ const useStyles = makeStyles((theme: Theme) =>
       '& + &': {
         marginLeft: theme.spacing(3)
       }
+    },
+    errorMessage: {
+      color: theme.palette.error.main
     }
   })
 );
@@ -25,9 +29,15 @@ interface IProps {
   onClose: () => void;
   onSubmit: (input: IUpdateUserInputs) => Promise<void>;
   user: IUser;
+  errorMessage?: string;
 }
 
-const UpdateUser: React.FC<IProps> = ({ onClose, onSubmit, user }) => {
+const UpdateUser: React.FC<IProps> = ({
+  onClose,
+  onSubmit,
+  user,
+  errorMessage
+}) => {
   const { register, handleSubmit, errors } = useForm<IUpdateUserInputs>();
   const classes = useStyles();
 
@@ -39,6 +49,11 @@ const UpdateUser: React.FC<IProps> = ({ onClose, onSubmit, user }) => {
     <React.Fragment>
       <DialogTitle>Update user details</DialogTitle>
       <DialogContent>
+        {errorMessage && (
+          <Typography className={classes.errorMessage}>
+            {errorMessage}
+          </Typography>
+        )}
         <TextField
           autoFocus
           margin="normal"

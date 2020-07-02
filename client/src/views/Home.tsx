@@ -33,6 +33,11 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     textCenter: {
       textAlign: 'center'
+    },
+    textError: {
+      color: theme.palette.error.main,
+      marginTop: theme.spacing(2),
+      whiteSpace: 'pre-line'
     }
   })
 );
@@ -98,17 +103,27 @@ const Home: React.FC = () => {
   }
 
   if (error) {
+    let errorMessage = '';
+    const { graphQLErrors, networkError } = error;
+    if (graphQLErrors.length) {
+      errorMessage = graphQLErrors.map(e => e.message).join('\n');
+    } else if (networkError) {
+      errorMessage = error.message;
+    }
+
     template = (
-      <Typography variant="h5" className={classes.textCenter}>
-        Something went wrong! Please try again later.
-      </Typography>
+      <div className={classes.textCenter}>
+        <Typography variant="h5">
+          Something went wrong! Please try again later.
+        </Typography>
+        <Typography variant="h5" className={classes.textError}>
+          {errorMessage}
+        </Typography>
+      </div>
     );
   }
 
   if (users && users.length && count) {
-    if (!users.length && tablePage > 0) {
-    }
-
     template = (
       <DataTable
         count={count}

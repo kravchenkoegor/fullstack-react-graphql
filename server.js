@@ -7,7 +7,10 @@ const mongoose = require('mongoose');
 
 // Start Express server
 const app = express();
-app.use('/static', express.static(path.join(__dirname, '/client/build/static')));
+app.use(
+  '/static',
+  express.static(path.join(__dirname, '/client/build/static'))
+);
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '/client/build/index.html'));
 });
@@ -25,7 +28,10 @@ const mongoConfig = {
 mongoose
   .connect(process.env.DATABASE_URL, mongoConfig)
   .then(() => console.log('MongoDB connected'))
-  .catch(error => console.log(error));
+  .catch(error => {
+    console.log(error);
+    process.exit(1);
+  });
 
 // Import typeDefs and resolvers
 const typeDefs = fs.readFileSync(path.join(__dirname, 'typeDefs.gql'), 'utf-8');
@@ -35,10 +41,6 @@ const resolvers = require('./resolvers');
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  formatError: error => ({
-    name: error.name,
-    message: error.message.replace('Context creation failed: ', '')
-  }),
   context: { User }
 });
 

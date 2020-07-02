@@ -4,6 +4,7 @@ import Dialog from '@material-ui/core/Dialog';
 import DeleteUser from './Dialogs/DeleteUser';
 import UpdateUser from './Dialogs/UpdateUser';
 import ViewUserDetails from './Dialogs/ViewUserDetails';
+import { formatMutationError } from '../views/CreateUser';
 import { COUNT, DELETE_USER, UPDATE_USER } from '../queries';
 import { IUser, IUpdateUserInputs, DialogType } from '../types';
 
@@ -22,7 +23,7 @@ const FormDialog: React.FC<IProps> = ({
   userId,
   userData
 }) => {
-  const [updateUser] = useMutation(UPDATE_USER);
+  const [updateUser, { error: updateUserError }] = useMutation(UPDATE_USER);
   const [deleteUser] = useMutation<{ deleteUser: IUser }>(DELETE_USER, {
     refetchQueries: ['GetUsers'],
     update(cache) {
@@ -46,8 +47,12 @@ const FormDialog: React.FC<IProps> = ({
   };
 
   const onUpdateUser = async (input: IUpdateUserInputs) => {
-    await updateUser({ variables: { id: userId, input } });
-    onClose();
+    try {
+      await updateUser({ variables: { id: userId, input } });
+      onClose();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   let template: React.ReactElement | null = null;
@@ -61,6 +66,7 @@ const FormDialog: React.FC<IProps> = ({
           onClose={onClose}
           onSubmit={input => onUpdateUser(input)}
           user={userData}
+          errorMessage={formatMutationError(updateUserError)}
         />
       );
       break;

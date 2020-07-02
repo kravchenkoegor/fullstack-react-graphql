@@ -1,5 +1,13 @@
 const { EmailAddressResolver } = require('graphql-scalars');
 
+const handleError = error => {
+  if (error.code === 11000 || error.codeName === 'DuplicateKey') {
+    throw new Error('Duplicate key');
+  } else {
+    throw new Error(error);
+  }
+};
+
 module.exports = {
   Email: EmailAddressResolver,
   Query: {
@@ -8,7 +16,7 @@ module.exports = {
         const user = await User.findOne({ id });
         return user;
       } catch (error) {
-        res.status(500).json({ error });
+        handleError(error);
       }
     },
     users: async (_, args, { User }) => {
@@ -17,12 +25,15 @@ module.exports = {
         const users = await User.find({}).skip(skip).limit(limit);
         return users;
       } catch (error) {
-        res.status(500).json({ error });
+        handleError(error);
       }
     },
     count: async (_, args, { User }) => {
-      const count = await User.countDocuments({});
-      return count;
+      try {
+        return await User.countDocuments({});
+      } catch (error) {
+        handleError(error);
+      }
     }
   },
   Mutation: {
@@ -31,7 +42,7 @@ module.exports = {
         const user = await new User(input).save();
         return user;
       } catch (error) {
-        res.status(500).json({ error });
+        handleError(error);
       }
     },
     async updateUser(_, { id, input }, { User }) {
@@ -50,14 +61,14 @@ module.exports = {
         );
         return updatedUser;
       } catch (error) {
-        res.status(500).json({ error });
+        handleError(error);
       }
     },
     async deleteUser(_, { id }, { User }) {
       try {
         return await User.findOneAndRemove({ id });
       } catch (error) {
-        res.status(500).json({ error });
+        handleError(error);
       }
     }
   }
