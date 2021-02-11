@@ -47,8 +47,10 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const User: React.FC = () => {
   const history = useHistory();
-  const { id } = useParams();
-  const { loading, error, data } = useQuery<{ user: IUser }>(GET_USER, { variables: { id } });
+  const { id } = useParams() as { id: string };
+  const { loading, error, data } = useQuery<{ user: IUser }>(GET_USER, {
+    variables: { id }
+  });
 
   const classes = useStyles();
 
@@ -78,7 +80,11 @@ const User: React.FC = () => {
         </Box>
         <UserDetails user={data!.user} />
         <Box mt={2} className={classes.actions}>
-          <Button color="primary" onClick={() => history.goBack()} startIcon={<ArrowBackIos />}>
+          <Button
+            color="primary"
+            onClick={() => history.goBack()}
+            startIcon={<ArrowBackIos />}
+          >
             Go back
           </Button>
         </Box>
